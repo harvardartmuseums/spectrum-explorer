@@ -15,6 +15,10 @@
             #info, #today {position: fixed;font-size: 0.9em;}
             #logo {position: absolute; top:45px; left:45px;}
             #spectrum {position: absolute; top:122px;}
+            .copybutton {
+			button span {
+				display: none;
+			}
         </style>
         <script type="text/javascript">
           var _gaq = _gaq || [];
@@ -35,10 +39,14 @@
         <div id="spectrum"></div>
         <span id="today"></span>
         <span id="info"></span>
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script src="js/config.js"></script>
         <script src="js/d3/d3.v3.min.js"></script>
+        <script src="js/clipboard/clipboard.min.js"></script>
         <script type="text/javascript">
+            new Clipboard('.copybutton');
+            new Clipboard('.color-bar');
+
             var monthNames = [ "January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December" ];
 
@@ -97,13 +105,14 @@
                             .enter().append("rect")
                                 .style("fill", function (d) {return d.color;})
                                 .attr("class", "color-bar")
+                                .attr("data-clipboard-target", "#selectedhex")
                                 .attr("width", barWidth + "px")
                                 .attr("height", function(d) {return d.isToday ? "200px" :  "100px";})
                                 .attr("x", function(d) {return barStartingPosition + barWidth*(d.daynumber-1);})
                                 .attr("y",  function(d) {return d.isToday ? height/2 - 150 : height/2-50;})
                                 .on("mouseover", function(d) {
                                     if (!d.isToday) {
-                                        $("#info").html(d.monthName + " " + d.day + ", " + d.color + ", R:" + d.rgb.r + " G:" + d.rgb.g + " B:" + d.rgb.b);
+                                        $("#info").html(d.monthName + " " + d.day + ", " + "<span id='selectedhex'>" + d.color + "</span>" + ", R:" + d.rgb.r + " G:" + d.rgb.g + " B:" + d.rgb.b);
                                         var t = d3.select(this);
                                         t.attr("height", "200px");
                                         $("#info").css("left", t.attr("x")+"px");
@@ -121,9 +130,9 @@
                 // Call out the color of the day
                 data.records.forEach(function(d) {
                     if (d.isToday) {
-                        $("#today").html("Today is " + d.monthName + " " + d.day + ", " + d.color + ", R:" + d.rgb.r + " G:" + d.rgb.g + " B:" + d.rgb.b)
+                        $("#today").html("Today is " + d.monthName + " " + d.day + ", " + "<span id='todayhex'>" + d.color + "</span>" + ", R:" + d.rgb.r + " G:" + d.rgb.g + " B:" + d.rgb.b  + "  " + "<button data-clipboard-target='#todayhex' class='copybutton' type='button'><span>Copy</span></button>")
                                 .css("left", barStartingPosition + barWidth*(d.daynumber-1) + "px")
-                                .css("top", height/2 - 150 + headerHeight - 15 + "px");
+                                .css("top", height/2 - 163 + headerHeight - 15 + "px");
                     }
                 });
             });
